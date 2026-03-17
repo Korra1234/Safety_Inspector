@@ -18,7 +18,7 @@
     --red-glow: rgba(192,57,43,0.18);
     --amber: #d4820a;
     --off-white: #c8c4bc;
-    --muted: #c0bcb6;
+    --muted: #ffffff;
     --mono: 'Share Tech Mono', monospace;
     --display: 'Syne', sans-serif;
     --body: 'Barlow Condensed', sans-serif;
@@ -710,13 +710,6 @@
   const LINE_PAUSE = 40;
   const END_HOLD   = 600;
 
-  function maybeGlitch(el) {
-    if (Math.random() < 0.18) {
-      el.classList.add('t-glitch');
-      setTimeout(() => el.classList.remove('t-glitch'), 220);
-    }
-  }
-
   function revealSite() {
     if (terminated) return;
     terminated = true;
@@ -756,12 +749,7 @@
       if (charIndex < def.text.length) {
         currentEl.textContent += def.text[charIndex];
         charIndex++;
-        // play click on ~every 2nd character to avoid audio spam
         if (charIndex % 2 === 0) playClick();
-        if (Math.random() < 0.015) {
-          currentEl.classList.add('t-glitch');
-          setTimeout(() => currentEl && currentEl.classList.remove('t-glitch'), 200);
-        }
         setTimeout(typeChar, CHAR_SPEED + (Math.random() * 14 - 7));
       } else {
         if (def.append) {
@@ -771,7 +759,6 @@
           span.textContent = def.append;
           currentEl.appendChild(span);
         }
-        maybeGlitch(currentEl);
         playLineDone(def.cls);
         lineIndex++;
         setTimeout(typeLine, LINE_PAUSE + Math.random() * 80);
@@ -780,22 +767,6 @@
 
     typeChar();
   }
-
-  // Periodic visual glitch on rendered lines
-  setInterval(() => {
-    if (terminated) return;
-    const lines = container.querySelectorAll('.t-line');
-    if (!lines.length) return;
-    const target = lines[Math.floor(Math.random() * lines.length)];
-    target.classList.add('t-glitch');
-    setTimeout(() => target.classList.remove('t-glitch'), 200);
-  }, 1400);
-
-  // Browsers require a user gesture before AudioContext can run.
-  // We start on first click/keydown, or auto-start after a short delay
-  // (most modern browsers allow autoplay for short bursts).
-  document.addEventListener('click', () => { try { getAudio().resume(); } catch(e){} }, { once: true });
-  document.addEventListener('keydown', () => { try { getAudio().resume(); } catch(e){} }, { once: true });
 
   setTimeout(typeLine, 400);
 
